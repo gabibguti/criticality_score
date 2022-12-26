@@ -94,7 +94,7 @@ func makeConfig(ctx context.Context, logger *zap.Logger, opts ...Option) *config
 		defaultSourceStatus: sourceStatusEnabled,
 		sourceStatuses:      make(map[SourceType]sourceStatus),
 		gitHubHTTPClient:    defaultGitHubHTTPClient(ctx, logger),
-		gcpProject:          "",
+		gcpProject:          "openssf",
 		gcpDatasetName:      DefaultGCPDatasetName,
 		gcpDatasetTTL:       time.Duration(0),
 	}
