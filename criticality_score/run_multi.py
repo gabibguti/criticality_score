@@ -718,6 +718,23 @@ def override_params(override_params):
             raise Exception(
                 'Wrong format argument, unknown parameter: ' + param_name)
 
+def get_multi_repository_score(repos, params):
+    with open(repos, "r") as input_file:
+        csv_reader = csv.reader(input_file, delimiter=',')
+        for index, row in enumerate(csv_reader):
+            repo = row[0]
+            logging.info(f"#{index + 1} Generating score for {repo}")
+            output = get_repository_score_from_raw_stats(repo, params)
+            if not output:
+                continue
+            with open("output.csv", "a") as output_file:                
+                csv_writer = csv.DictWriter(output_file, fieldnames=output.keys())
+                if index == 0:
+                    # First output needs to be true in order to add headers
+                    csv_writer.writeheader()
+                if output:
+                    output=[output]
+                    csv_writer.writerows(output)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -726,6 +743,7 @@ def main():
     group.add_argument("--repo",
                         type=str,
                         help="repository url")
+    group.add_argument("--repos", type=str, help="path of a local csv file with repo urls")
     group.add_argument("--local-file",
             type=str,
             dest="l_file",
@@ -757,6 +775,8 @@ def main():
     output = None
     if args.repo:
         output = get_repository_score_from_raw_stats(args.repo, args.params)
+    if args.repos:
+        get_multi_repository_score(args.repos, args.params)
     elif args.l_file:
         if args.format != "csv":
             logger.error(f"Only support for the format of csv, now is {args.format}")
